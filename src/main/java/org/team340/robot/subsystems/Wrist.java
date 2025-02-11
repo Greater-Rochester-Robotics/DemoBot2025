@@ -12,7 +12,6 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-
 import org.team340.lib.util.Math2;
 import org.team340.lib.util.Tunable;
 import org.team340.lib.util.Tunable.TunableDouble;
@@ -29,13 +28,13 @@ import org.team340.robot.Constants.RobotMap;
 public class Wrist extends GRRSubsystem {
 
     // Limits
-    private static final double kMinPos = Math.toRadians(20.0);
-    private static final double kMaxPos = Math.toRadians(140.0);
+    private static final double kMinPos = 0.024;
+    private static final double kMaxPos = 0.337;
 
     // Positions
     public enum Position {
-        kIntake(0.333333333333333),
-        kSafe(0.0961538461538462),
+        kIntake(0.337),
+        kSafe(0.03),
         kShootShort(0.222222222222222),
         kShootMedium(0.152777777777778),
         kShootFar(0.125);
@@ -52,7 +51,7 @@ public class Wrist extends GRRSubsystem {
     }
 
     // Misc
-    private static final double CLOSED_LOOP_ERR = Math.toRadians(4.0);
+    private static final double CLOSED_LOOP_ERR = 0.0111111111111111;
 
     private final SparkMax motor;
     private final SparkAbsoluteEncoder encoder;
@@ -100,13 +99,10 @@ public class Wrist extends GRRSubsystem {
             .primaryEncoderVelocityPeriodMs(20)
             .warningsPeriodMs(250);
 
-        config.absoluteEncoder
-            .velocityConversionFactor(1.0 / 60.0)
-            .inverted(true)
-            .zeroOffset(0.8);
+        config.absoluteEncoder.velocityConversionFactor(1.0 / 60.0).inverted(true).zeroOffset(0.8);
 
         config.closedLoop
-            .pid(1.85, 0.0, 0.3)
+            .pid(7.0, 0.0, 0.3)
             .iZone(0.0)
             .positionWrappingEnabled(false)
             .feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
@@ -131,7 +127,7 @@ public class Wrist extends GRRSubsystem {
      */
     private boolean atPosition(Position position) {
         return Math2.epsilonEquals(
-            MathUtil.inputModulus(encoder.getPosition(), -0.5,  0.5),
+            MathUtil.inputModulus(encoder.getPosition(), -0.5, 0.5),
             position.getRotations(),
             CLOSED_LOOP_ERR
         );
